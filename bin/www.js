@@ -4,6 +4,8 @@
  * Module dependencies.
  */
 
+var chat = require('../chat');
+var socketio = require('socket.io');
 var app = require('../app');
 var debug = require('debug')('chat-server:server');
 var http = require('http');
@@ -12,7 +14,7 @@ var http = require('http');
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3000');
+var port = normalizePort(process.env.PORT || '3100');
 app.set('port', port);
 
 /**
@@ -20,6 +22,14 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
+var io = socketio(server, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST']
+  }
+});
+
+chat(io);
 
 /**
  * Listen on provided port, on all network interfaces.
@@ -88,3 +98,5 @@ function onListening() {
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
 }
+
+server.listen(port, () => console.log(`server running on port: ${port}`));
